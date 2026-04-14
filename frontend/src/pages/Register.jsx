@@ -1,57 +1,33 @@
 import React from "react";
-import { useState, useContext } from "react";
-import { useNavigate, Link } from "react-router-dom"; // <-- added Link
-import { AuthContext } from "../context/authContext";
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 
-const Login = () => {
+const Register = () => {   // ✅ changed name
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const { login } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/login", {
+      await axios.post("http://localhost:5000/api/auth/register", { // ✅ changed API
         username,
         password,
       });
 
-      if (res.data.role === "student") {
-        try {
-          await axios.post(
-            "http://localhost:5000/api/rooms/allocate",
-            {},
-            {
-              headers: {
-                Authorization: `Bearer ${res.data.accessToken}`,
-              },
-            }
-          );
-        } catch (err) {
-          console.log("Room allocation skipped:", err.response?.data?.message);
-        }
-      }
-
-      console.log("LOGIN RESPONSE:", res.data);
-      login(res.data);
-
-      if (res.data.role === "admin") {
-        navigate("/admin");
-      } else {
-        navigate("/");
-      }
+      alert("Registered successfully!");
+      navigate("/login"); // ✅ redirect to login
     } catch (err) {
       console.error(err);
-      alert(err.response?.data?.message || "Login failed");
+      alert(err.response?.data?.message || "Register failed");
     }
   };
 
   return (
     <div style={{ padding: "40px" }}>
-      <h2>Login</h2>
+      <h2>Register</h2>  {/* ✅ changed title */}
 
       <form onSubmit={handleSubmit}>
         <input
@@ -74,14 +50,14 @@ const Login = () => {
 
         <br /><br />
 
-        <button type="submit">Login</button>
+        <button type="submit">Register</button> {/* ✅ changed text */}
       </form>
 
       <p>
-        Don't have an account? <Link to="/register">Register here</Link>
+        Already have an account? <Link to="/login">Login here</Link> {/* ✅ reversed */}
       </p>
     </div>
   );
 };
 
-export default Login;
+export default Register; // ✅ changed export
